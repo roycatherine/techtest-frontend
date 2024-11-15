@@ -3,7 +3,7 @@
         <div class="text-h3 text-center mb-10">The Bid Calculation Tool</div>
 
         <v-sheet class="mx-auto pa-5" width="400">
-            <v-form fast-fail validate-on="submit lazy" @submit.prevent>
+            <v-form v-model="isFormValid" fast-fail @submit.prevent>
                 <v-select
                     v-model="selectedType"
                     label="Vehicle Type"
@@ -32,7 +32,17 @@
                     </v-list>
                 </v-card>
 
-                <v-btn :loading="loading" @click="saveResults(vehiclePrice, selectedType, fees)" class="mt-4" type="submit" variant="outlined" block>Save results</v-btn>
+                <v-btn
+                    :disabled="!isFormValid"
+                    :loading="loading"
+                    @click="saveResults(vehiclePrice, selectedType, fees)"
+                    class="mt-4"
+                    type="submit"
+                    variant="outlined"
+                    block
+                >
+                    Save results
+                </v-btn>
             </v-form>
         </v-sheet>
 
@@ -49,6 +59,7 @@
 <script>
 export default {
     data: () => ({
+        isFormValid: false,
         loading: false,
         selectedType: 'common',
         vehicleTypes: [
@@ -58,8 +69,8 @@ export default {
         vehiclePrice: 0,
         vehiclePriceRules: [
             value => {
-                if (value) return true
-                return 'Price must not be empty.';
+                if (value && value <= 10000000) return true
+                return 'Price must not be empty or greater than 10000000.';
             },
         ],
         fees: {
@@ -72,7 +83,7 @@ export default {
         snackbar: false,
         snackbarColor: 'danger',
         snackbarMessage: 'There vas an error. Please try again later.',
-        timeout: 5000,
+        timeout: 3000,
     }),
     watch: {
         vehiclePrice(newPrice) {
@@ -89,6 +100,10 @@ export default {
                     price: price,
                     vehicleType: type,
                 }).toString());
+
+                if (!response.ok) {
+                    throw new Error(`Response status: ${response.status}`);
+                }
                 const updatedFees = await response.json();
 
                 // Update fees
@@ -115,7 +130,7 @@ export default {
             });
 
             try {
-                await fetch("http://localhost/api/vehicles/", {
+                const response = await fetch("http://localhost/api/vehicles/", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
@@ -125,6 +140,10 @@ export default {
                         fees: formattedFees
                     }),
                 });
+
+                if (!response.ok) {
+                    throw new Error(`Response status: ${response.status}`);
+                }
                 this.loading = false;
                 this.updateSnackbar("green", "Results have been saved in the database!")
 
