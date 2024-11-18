@@ -22,5 +22,5 @@ This is a coding challenge mvp and not a real product.
 1. If not already done, install [Docker Desktop](https://www.docker.com/products/docker-desktop).
 2. [Backend](https://github.com/roycatherine/techtest-backend) must be installed to work.
 3. Run `docker compose up -d` in the project's directory to build the container and start all services.
-4. The site will be accessible on http://localhost:8000/. You must not have anything else running on that port. Wait a few seconds for Vuetify to load.
+4. The site will be accessible on http://localhost:8000/. You must not have anything else running on that port. Wait a few seconds for Vuetify to load, you may have to refresh the page.
 5. Have fun!
